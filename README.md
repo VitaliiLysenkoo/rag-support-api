@@ -40,7 +40,32 @@ docker-compose up -d
 ## 💡 API Usage
 
 1. **`POST /seed`**: Scans the `/test_documents` directory and ingests all files into the vector database in the background.
-2. **`POST /ask`**: Ask a question (e.g., *"Who is my manager at Valve?"*). Returns the AI answer and cites the exact document sources. **Note (LLM-based Citation & Semantic Cache):** The system uses a two-stage retrieval process. First, the vector database finds the top 30 most mathematically similar text chunks. Then, the LLM reads all 30 chunks, forms an answer, and strictly filters the `sources` array to return *only* the specific snippets that actually contained the answer, hiding the irrelevant noise from the user. Finally, the generated answer is cached semantically; future identical questions will return instantly in <0.05s without invoking the LLM.
+2. **`POST /ask`**: Ask a question. Returns the AI answer and cites the exact document sources. **Note (LLM-based Citation & Semantic Cache):** The system uses a two-stage retrieval process. First, the vector database finds the top 30 most mathematically similar text chunks. Then, the LLM reads all 30 chunks, forms an answer, and strictly filters the `sources` array to return *only* the specific snippets that actually contained the answer. Finally, the generated answer is cached semantically; future identical questions will return instantly in <0.05s without invoking the LLM.
+
+**Example Request:**
+```json
+{
+  "question": "Who is my manager at Valve according to the handbook?"
+}
+```
+
+**Example Response:**
+```json
+{
+  "answer": "Valve does not have any management, and nobody reports to anybody else. Even the founder/president is not your manager.",
+  "sources": [
+    {
+      "document": "Valve_Employee_Handbook.pdf (Page 7)",
+      "snippet": "VALVE: HANDBOOK FOR NEW EMPLOYEES – 4 – Fig. 1-3 and we’ve also been able to diversify. We’re an ent..."
+    },
+    {
+      "document": "Valve_Employee_Handbook.pdf (Page 7)",
+      "snippet": "maintaining an environment where they’ll flourish. \t That’s why Valve is flat. It’s our shorthand wa..."
+    }
+  ],
+  "cached": true
+}
+```
 
 ## Architecture Highlights
 
