@@ -24,12 +24,18 @@ cp .env.example .env
 nano .env # Insert OPENAI_API_KEY
 ```
 
-2. Run the application (Production Gunicorn server):
+2. Run database migrations:
 ```bash
-docker-compose up -d --build
+docker-compose build api
+docker-compose run --rm api alembic upgrade head
 ```
 
-3. Open **http://localhost:8000/docs** in your browser.
+3. Run the application (Production Gunicorn server):
+```bash
+docker-compose up -d
+```
+
+4. Open **http://localhost:8000/docs** in your browser.
 
 ## 💡 API Usage
 
