@@ -1,0 +1,35 @@
+
+services:
+  db:
+    # Используем готовый образ Postgres с уже установленным расширением pgvector
+    image: pgvector/pgvector:pg16
+    container_name: rag_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: rag_user
+      POSTGRES_PASSWORD: rag_password
+      POSTGRES_DB: rag_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    container_name: rag_api
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      # Заменяем localhost на имя контейнера (db)
+      - DATABASE_URL=postgresql://rag_user:rag_password@db:5432/rag_db
+      # Ключ OpenAI пробрасывается из локального файла .env (нужно чтобы на сервере он тоже лежал рядом с docker-compose)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      - db
+    volumes:
+      # Пробрасываем папку с документами внутрь контейнера
+      - ./test_documents:/app/test_documents
+
+volumes:
+  postgres_data:
