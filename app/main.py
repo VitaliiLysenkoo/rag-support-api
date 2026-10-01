@@ -28,7 +28,6 @@ async def add_process_time_header(request: Request, call_next):
     """
     Observability Middleware:
     Tracks the execution time of every request and logs it.
-    In a real Senior production environment, this data would be sent to Prometheus/Grafana.
     """
     start_time = time.perf_counter()
     response = await call_next(request)
